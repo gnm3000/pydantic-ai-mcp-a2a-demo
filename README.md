@@ -1,5 +1,6 @@
 # MarketInsider MCP
 
+
 MarketInsider is an educational market-data project and a practical guide to
 building MCP servers with FastMCP 4. It shows how to model server capabilities,
 connect them to an AI agent, and test the integration without relying on live
@@ -8,6 +9,9 @@ market data in unit tests.
 The server uses `yfinance` for market data and caches historical prices in
 `.cache/market-data`. This is a learning project, not a trading system or
 investment advice.
+
+
+<img width="1622" height="1074" alt="image" src="https://github.com/user-attachments/assets/c3eb6e06-2049-4560-af0d-0b3a7d2cbf8e" />
 
 ## What this project demonstrates
 
