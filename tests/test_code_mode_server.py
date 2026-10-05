@@ -145,5 +145,5 @@ def test_main_loads_environment_and_runs_the_http_server(monkeypatch):
 
     assert calls == [
         "environment",
-        {"transport": "http", "host": "0.0.0.0", "port": 8001},
+        {"transport": "http", "host": "0.0.0.0", "port": 8006},
     ]

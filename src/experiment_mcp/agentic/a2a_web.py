@@ -151,14 +151,14 @@ async def ag_ui(request: Request) -> Response:
             {"error": "Set OPENROUTER_API_KEY in .env to use the chat."}, status_code=503
         )
     base_url = os.getenv("A2A_PUBLIC_URL", "http://127.0.0.1:8100")
-    code_mode_url = os.getenv("CODE_MODE_MCP_URL", "http://127.0.0.1:8001/mcp")
+    code_mode_url = os.getenv("CODE_MODE_MCP_URL", "http://127.0.0.1:8006/mcp")
     mcp_token = os.getenv("MCP_DEV_TOKEN", "")
     agent = create_coordinator(api_key, base_url, code_mode_url, mcp_token)
     return await AGUIAdapter.dispatch_request(request, agent=agent)
 
 
 def create_app() -> Starlette:
-    mcp_url = os.getenv("MCP_URL", "http://mcp-server:8000/mcp")
+    mcp_url = os.getenv("MCP_URL", "http://127.0.0.1:8005/mcp")
     token = os.getenv("MCP_DEV_TOKEN", "")
     routes = [Route("/ag-ui", ag_ui, methods=["POST"])]
     for key, (name, description) in SPECIALISTS.items():

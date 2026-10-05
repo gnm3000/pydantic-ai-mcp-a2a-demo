@@ -5,7 +5,7 @@ services:
     environment:
       MCP_DEV_TOKEN: ${MCP_DEV_TOKEN:?Set MCP_DEV_TOKEN in .env}
     ports:
-      - "8000:8000"
+      - "8005:8005"
     volumes:
       - market-data-cache:/app/.cache/market-data
     restart: unless-stopped
@@ -16,7 +16,7 @@ services:
     environment:
       MCP_DEV_TOKEN: ${MCP_DEV_TOKEN:?Set MCP_DEV_TOKEN in .env}
     ports:
-      - "8001:8001"
+      - "8006:8006"
     volumes:
       - market-data-cache:/app/.cache/market-data
     restart: unless-stopped
@@ -34,7 +34,7 @@ services:
       - --host
       - 0.0.0.0
       - --mcp-port
-      - "8000"
+      - "8005"
       - --dev-port
       - "8080"
       - --no-reload
@@ -51,8 +51,8 @@ services:
     command: ["uv", "run", "--frozen", "uvicorn", "experiment_mcp.agentic.a2a_web:app", "--host", "0.0.0.0", "--port", "8100"]
     environment:
       MCP_DEV_TOKEN: ${MCP_DEV_TOKEN:?Set MCP_DEV_TOKEN in .env}
-      MCP_URL: http://mcp-server:8000/mcp
-      CODE_MODE_MCP_URL: http://code-mode-server:8001/mcp
+      MCP_URL: http://mcp-server:8005/mcp
+      CODE_MODE_MCP_URL: http://code-mode-server:8006/mcp
       A2A_PUBLIC_URL: http://127.0.0.1:8100
       OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
       OPENROUTER_MODEL: ${OPENROUTER_MODEL:-nvidia/nemotron-3-ultra-550b-a55b:free}

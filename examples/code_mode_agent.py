@@ -7,7 +7,7 @@ from pydantic_ai.messages import ToolCallPart
 from pydantic_ai.models.openrouter import OpenRouterModel
 from pydantic_ai.providers.openrouter import OpenRouterProvider
 
-CODE_MODE_MCP_URL = "http://127.0.0.1:8001/mcp"
+CODE_MODE_MCP_URL = "http://127.0.0.1:8006/mcp"
 MODEL_NAME = "nvidia/nemotron-3-ultra-550b-a55b:free"
 
 

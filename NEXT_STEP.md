@@ -1,7 +1,7 @@
 # FastMCP CodeMode Demo Endpoint
 
 **Status: Implemented.** The project now includes a separate authenticated
-CodeMode endpoint on port `8001`, a read-only market tool catalog, a sandboxed
+CodeMode endpoint on port `8006`, a read-only market tool catalog, a sandboxed
 execution example, and a Pydantic AI client. This plan remains as an
 implementation record and acceptance checklist.
 
@@ -50,7 +50,7 @@ MCP App, task demo, or other clients.
 ### 3. Create a dedicated server factory and endpoint
 
 - Add a `code_mode_server` module and a separate CLI entry point or documented
-  command that starts it on a different local port, such as `8001`.
+  command that starts it on a different local port, such as `8006`.
 - Protect the endpoint with the same local bearer-token configuration used by
   the main MCP server.
 - Apply FastMCP's `CodeMode` transform only to this server.

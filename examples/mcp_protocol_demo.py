@@ -42,7 +42,7 @@ async def show_progress(progress: float, total: float | None, message: str | Non
 
 async def run_demo(tickers: list[str], token: str) -> None:
     client = Client(
-        "http://127.0.0.1:8000/mcp",
+        "http://127.0.0.1:8005/mcp",
         auth=token,
         elicitation_handler=handle_elicitation,
         progress_handler=show_progress,

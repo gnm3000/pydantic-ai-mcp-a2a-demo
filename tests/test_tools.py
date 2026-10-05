@@ -110,7 +110,7 @@ def test_server_main_runs_http_transport(monkeypatch):
 
     server_module.main()
 
-    assert calls == {"transport": "http", "host": "0.0.0.0", "port": 8000}
+    assert calls == {"transport": "http", "host": "0.0.0.0", "port": 8005}
 
 
 def test_multi_ticker_task_reports_progress_and_company_data(monkeypatch):

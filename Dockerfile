@@ -24,6 +24,6 @@ COPY skills/ ./skills/
 COPY --from=ui-build /app/ui/dist ./ui/dist
 RUN uv sync --frozen --no-dev
 
-EXPOSE 8000 8080
+EXPOSE 8005 8006 8080
 
 CMD ["uv", "run", "--frozen", "experiment-mcp"]

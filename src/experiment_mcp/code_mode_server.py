@@ -15,7 +15,7 @@ from experiment_mcp.interface.mcp_code_mode import register_code_mode_tools
 from experiment_mcp.interface.mcp_observability import register_console_observability
 
 HOST = "0.0.0.0"
-PORT = 8001
+PORT = 8006
 SANDBOX_LIMITS = {
     "max_duration_secs": 15,
     "max_memory": 50_000_000,
