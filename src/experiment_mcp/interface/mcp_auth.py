@@ -13,7 +13,7 @@ def create_local_auth(token: str | None) -> StaticTokenVerifier:
     return StaticTokenVerifier(
         tokens={
             token: {
-                "client_id": "quantinsider-local-client",
+                "client_id": "marketinsider-local-client",
                 "scopes": ["market:read"],
             }
         },

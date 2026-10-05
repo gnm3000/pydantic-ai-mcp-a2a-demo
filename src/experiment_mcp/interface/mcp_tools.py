@@ -22,7 +22,7 @@ from experiment_mcp.core.analysis import (
 )
 from experiment_mcp.core.models import PriceHistory
 
-MARKET_APP_URI = "ui://quantinsider/price-chart.html"
+MARKET_APP_URI = "ui://marketinsider/price-chart.html"
 PRICE_PERIODS = ("5d", "1mo", "3mo", "6mo", "1y")
 
 

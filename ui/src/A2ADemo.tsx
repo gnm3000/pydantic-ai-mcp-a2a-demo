@@ -11,8 +11,9 @@ const agents = [
   { id: 'coordinator', name: 'Market Coordinator', role: 'Coordinates research', icon: '✳', color: 'violet' },
   { id: 'fundamentals', name: 'Company Fundamentals', role: 'Company profile and business', icon: '◈', color: 'blue' },
   { id: 'prices', name: 'Price Analyst', role: 'Price history and performance', icon: '↗', color: 'green' },
-  { id: 'news', name: 'Market News', role: 'Noticias recientes', icon: '◷', color: 'orange' },
+  { id: 'news', name: 'Market News', role: 'Recent headlines', icon: '◷', color: 'orange' },
 ]
+const codeMode = { id: 'code-mode', name: 'Market Data · CodeMode', role: 'Sandboxed MCP execution', icon: '⌘', color: 'green' }
 const displayNames: Record<string, string> = {
   delegate_to_fundamentals_agent: 'fundamentals',
   delegate_to_price_analyst: 'prices',
@@ -83,7 +84,7 @@ export default function A2ADemo() {
           const type = String(event.type ?? '')
           if (type === 'TOOL_CALL_START') {
             const toolName = String(event.toolCallName ?? '')
-            const agent = displayNames[toolName]
+            const agent = displayNames[toolName] ?? (toolName.toLowerCase().endsWith('execute') ? codeMode.id : undefined)
             if (agent) {
               const id = String(event.toolCallId ?? crypto.randomUUID())
               setActiveAgent(agent)
@@ -121,7 +122,7 @@ export default function A2ADemo() {
 
   return <main className="a2a-shell">
     <header className="a2a-topbar">
-      <a href="/" className="a2a-brand"><span className="a2a-logo">Q</span><span>QUANTINSIDER <small>AGENT STUDIO</small></span></a>
+      <a href="/" className="a2a-brand"><span className="a2a-logo">M</span><span>MARKETINSIDER <small>AGENT STUDIO</small></span></a>
       <div className="protocol-pills"><span><i /> AG-UI <small>streaming</small></span><span><i /> A2A <small>delegation</small></span></div>
       <a className="back-link" href={priceExplorerUrl.href} target="_blank" rel="noreferrer">Price explorer <span>↗</span></a>
     </header>
@@ -137,17 +138,17 @@ export default function A2ADemo() {
         <div className="delegation-panel"><div className="delegation-heading"><span>DELEGATION TRACE</span><span className="live-dot" /></div>
           {delegations.length === 0 ? <p className="trace-empty">Specialist calls will appear here during the conversation.</p> :
             delegations.map((item) => {
-              const agent = agents.find((entry) => entry.id === item.agent)!
+              const agent = item.agent === codeMode.id ? codeMode : agents.find((entry) => entry.id === item.agent)!
               return <div className="trace-item" key={item.id}><span className={`trace-icon ${agent.color}`}>{agent.icon}</span><span className="trace-copy"><strong>{agent.name}</strong><small>{item.status === 'working' ? 'Querying the MCP…' : item.status === 'done' ? 'Response received' : 'Did not complete'}</small></span><span className={`trace-status ${item.status}`}>{item.status === 'working' ? '•••' : item.status === 'done' ? '✓' : '!'}</span></div>
             })}
         </div>
-        <div className="a2a-architecture"><span className="architecture-label">UNDER THE HOOD</span><p><b>Coordinator</b> <span>→</span> <b>A2A agents</b> <span>→</span> <b>FastMCP</b></p><small>AG-UI streams updates to this chat.</small></div>
+        <div className="a2a-architecture"><span className="architecture-label">UNDER THE HOOD</span><p><b>Coordinator</b> <span>→</span> <b>A2A specialists</b><br /><b>Coordinator</b> <span>→</span> <b>CodeMode</b> <span>→</span> <b>FastMCP</b></p><small>AG-UI streams updates to this chat.</small></div>
       </aside>
       <section className="chat-panel">
         <div className="chat-heading"><div><p className="a2a-eyebrow">MULTI-AGENT RESEARCH</p><h1>Market research team</h1></div><span className={`chat-status ${running ? 'chat-running' : ''}`}><i />{running ? 'Working' : 'Ready'}</span></div>
         <div className="chat-content">
           {messages.length === 0 ? <div className="chat-welcome"><div className="welcome-orbit"><span>Q</span><i>✳</i></div><p className="a2a-eyebrow">COORDINATED MARKET INTELLIGENCE</p><h2>What would you like<br />the team to research?</h2><p>Ask about a company, recent price action, or news. The coordinator will bring in the right specialists.</p><div className="suggestion-list">
-            {['Summarize NVDA and its latest price movement', 'What does Microsoft do, and what is in the news?', 'Analyze AAPL fundamentals, prices, and recent news'].map((item) => <button key={item} onClick={() => setInput(item)}>{item}<span>↗</span></button>)}
+            {['Use CodeMode to compare NVDA’s five-day and one-month price movement', 'What does Microsoft do, and what is in the news?', 'Analyze AAPL fundamentals, prices, and recent news'].map((item) => <button key={item} onClick={() => setInput(item)}>{item}<span>↗</span></button>)}
           </div></div> : <div className="message-list">{messages.map((message) => <article key={message.id} className={`chat-message ${message.role}`}>
             {message.role === 'assistant' && <span className="message-avatar">✳</span>}<div><span className="message-author">{message.role === 'user' ? 'You' : 'Market Coordinator'}</span>
               {message.role === 'assistant'

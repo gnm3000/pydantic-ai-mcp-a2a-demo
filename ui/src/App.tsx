@@ -70,7 +70,7 @@ function PriceExplorer() {
   useEffect(() => {
     let active = true
     const app = new McpAppClient(
-      { name: 'Quantinsider Market Chart', version: '1.0.0' }, {},
+      { name: 'MarketInsider Market Chart', version: '1.0.0' }, {},
     )
     app.ontoolresult = (result) => {
       const data = parseHistory(result)

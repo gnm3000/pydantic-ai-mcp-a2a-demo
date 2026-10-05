@@ -12,6 +12,8 @@ source of investment advice.
 
 - FastMCP server over Streamable HTTP with bearer-token authentication and
   strict input validation.
+- Separate FastMCP CodeMode endpoint on port `8001`, with a curated
+  read-only market-data catalog and sandboxed tool chaining.
 - Price-analysis tools, historical OHLCV retrieval, JSON caching, ticker
   resources, versioned prompts, a market-analysis skill, and ticker completions.
 - Long-running multi-ticker task demo with progress updates and elicitation.
@@ -76,14 +78,30 @@ docker compose up --build
 ```
 
 - MCP server: `http://localhost:8000/mcp`
+- CodeMode MCP server: `http://localhost:8001/mcp`
 - FastMCP App preview: `http://localhost:8081`
-- AG-UI/A2A chat: `http://localhost:5173/a2a`
+- AG-UI/A2A chat: `http://localhost:5178/a2a`
+- The A2A coordinator can use the authenticated CodeMode MCP endpoint to
+  compose read-only market-data operations; its `execute` calls appear in the
+  delegation trace alongside A2A specialist calls.
 - A2A specialist agent cards: `/fundamentals`, `/prices`, and `/news` on port
   `8100`
 
 The FastMCP App preview uses a local development server without bearer auth
 because that preview does not forward the token. The MCP server itself remains
 authenticated.
+
+The CodeMode endpoint is a separate demo server. It exposes FastMCP's
+`search`, `get_schema`, and `execute` meta-tools over a sandbox limited to
+read-only market operations. FastMCP currently documents CodeMode as
+experimental. Its Python execution is constrained by explicit time, memory,
+recursion-depth, and tool-call limits.
+
+### When to use CodeMode
+
+Use CodeMode when an answer needs several MCP calls joined into one workflow: fetch data, compare it, calculate a result, and return a concise summary. The model discovers the relevant tools, writes Python and FastMCP executes it in a sandbox. For example, one run can fetch NVDA prices for two periods, compare returns, and report the change without sending every intermediate row back to the model. This can reduce context use and model round-trips for data-heavy tasks. It is not always faster: discovery and execution add overhead, and upstream APIs may dominate latency. For one simple lookup, a direct tool call is clearer. CodeMode composes permitted tools; it does not replace resources or A2A delegation. This demo restricts execution to read-only market tools and explicit limits by design.
+
+Based on the [FastMCP CodeMode documentation](https://gofastmcp.com/servers/transforms/code-mode).
 
 ## Agent examples
 
@@ -110,6 +128,18 @@ uv run python examples/mcp_protocol_demo.py --ticker NVDA --ticker AAPL
 
 The demo accepts up to five tickers and simulates 5–10 seconds of work for each
 one.
+
+To compare direct MCP tool use with CodeMode orchestration, start the stack and
+run the CodeMode agent:
+
+```bash
+uv run python examples/code_mode_cli.py --ticker NVDA --period 1mo
+```
+
+The CodeMode agent connects to port `8001`, discovers its tools, and can compose
+price-history retrieval with calculations in one sandboxed execution. The
+original Pydantic AI agent continues to use the direct-tool MCP endpoint on
+port `8000`.
 
 ## Architecture
 

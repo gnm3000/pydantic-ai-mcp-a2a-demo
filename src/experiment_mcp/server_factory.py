@@ -33,7 +33,7 @@ def create_server(*, auth_required: bool = True) -> FastMCP:
     auth: AuthProvider | None = (
         create_local_auth(os.getenv("MCP_DEV_TOKEN")) if auth_required else None
     )
-    server = FastMCP("Quantinsider Price Tools", strict_input_validation=True, auth=auth)
+    server = FastMCP("MarketInsider Price Tools", strict_input_validation=True, auth=auth)
     server.add_extension(TasksExtension())
     register_console_observability(server)
 

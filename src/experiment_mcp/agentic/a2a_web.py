@@ -17,6 +17,7 @@ from a2a.types import (
     SendMessageRequest,
 )
 from pydantic_ai import Agent, RunContext
+from pydantic_ai.mcp import MCPToolset
 from pydantic_ai.models.openrouter import OpenRouterModel
 from pydantic_ai.providers.openrouter import OpenRouterProvider
 from pydantic_ai.ui.ag_ui import AGUIAdapter
@@ -102,11 +103,18 @@ async def _ask_specialist(base_url: str, user_request: str) -> str:
     )
 
 
-def create_coordinator(api_key: str, a2a_base_url: str) -> Agent[None, str]:
+def create_coordinator(
+    api_key: str,
+    a2a_base_url: str,
+    code_mode_mcp_url: str,
+    mcp_token: str,
+) -> Agent[None, str]:
     model = OpenRouterModel(MODEL_NAME, provider=OpenRouterProvider(api_key=api_key))
+    code_mode = MCPToolset(code_mode_mcp_url, auth=mcp_token)
     agent = Agent(
         model,
         name="market_coordinator",
+        toolsets=[code_mode],
         instructions=(
             "You coordinate a market research team and synthesize market evidence returned "
             "by your colleagues. Do not provide investment advice. Never expose private reasoning."
@@ -143,7 +151,9 @@ async def ag_ui(request: Request) -> Response:
             {"error": "Set OPENROUTER_API_KEY in .env to use the chat."}, status_code=503
         )
     base_url = os.getenv("A2A_PUBLIC_URL", "http://127.0.0.1:8100")
-    agent = create_coordinator(api_key, base_url)
+    code_mode_url = os.getenv("CODE_MODE_MCP_URL", "http://127.0.0.1:8001/mcp")
+    mcp_token = os.getenv("MCP_DEV_TOKEN", "")
+    agent = create_coordinator(api_key, base_url, code_mode_url, mcp_token)
     return await AGUIAdapter.dispatch_request(request, agent=agent)
 
 

@@ -1,4 +1,18 @@
-# Next Step: Add a FastMCP CodeMode Demo Endpoint
+# FastMCP CodeMode Demo Endpoint
+
+**Status: Implemented.** The project now includes a separate authenticated
+CodeMode endpoint on port `8001`, a read-only market tool catalog, a sandboxed
+execution example, and a Pydantic AI client. This plan remains as an
+implementation record and acceptance checklist.
+
+## Verification
+
+- FastMCP `4.0.10` CodeMode imports, transforms the catalog, and executes a
+  sandboxed tool call.
+- `uv run ruff check .` and `uv run ruff format --check .` pass.
+- `uv run pytest` passes with 94 tests and 99.04% coverage.
+- `npm --prefix ui run build` succeeds.
+- `docker compose config --quiet` succeeds.
 
 ## Goal
 

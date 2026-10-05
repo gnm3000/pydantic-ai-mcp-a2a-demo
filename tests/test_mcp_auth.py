@@ -13,7 +13,7 @@ def test_local_auth_accepts_the_configured_token_with_read_scope():
     access_token = asyncio.run(verifier.verify_token("local-test-token-0123456789abcdef"))
 
     assert access_token is not None
-    assert access_token.client_id == "quantinsider-local-client"
+    assert access_token.client_id == "marketinsider-local-client"
     assert access_token.scopes == ["market:read"]
 
 

@@ -8,7 +8,7 @@ authors = [
 ]
 requires-python = ">=3.13"
 dependencies = [
-    "fastmcp[apps]>=4.0.10,<5",
+    "fastmcp[apps,code-mode]>=4.0.10,<5",
     "fastmcp-tasks>=4.0.10,<5",
     "logfire>=5.1.1",
     "pydantic-ai-slim[ag-ui,mcp,openrouter]>=2.54.0",
@@ -20,6 +20,7 @@ dependencies = [
 
 [project.scripts]
 experiment-mcp = "experiment_mcp:main"
+experiment-mcp-code-mode = "experiment_mcp.code_mode_server:main"
 
 [build-system]
 requires = ["uv_build>=0.12.3,<0.13.0"]

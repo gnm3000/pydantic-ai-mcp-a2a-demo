@@ -101,7 +101,7 @@ def test_open_price_chart_returns_app_data():
         "count": 1,
         "prices": [{"date": "2025-01-02T00:00:00+00:00", "Close": 10.5}],
     }
-    assert tool.meta["ui"]["resourceUri"] == "ui://quantinsider/price-chart.html"
+    assert tool.meta["ui"]["resourceUri"] == "ui://marketinsider/price-chart.html"
 
 
 def test_server_main_runs_http_transport(monkeypatch):

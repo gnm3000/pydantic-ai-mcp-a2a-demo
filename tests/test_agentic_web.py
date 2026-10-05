@@ -114,7 +114,13 @@ def test_ag_ui_requires_openrouter_key(monkeypatch):
 def test_ag_ui_dispatches_with_configured_model(monkeypatch):
     monkeypatch.setenv("OPENROUTER_API_KEY", "test-key")
     monkeypatch.setenv("A2A_PUBLIC_URL", "http://agents")
-    monkeypatch.setattr(a2a_web, "create_coordinator", lambda key, url: (key, url))
+    monkeypatch.setenv("CODE_MODE_MCP_URL", "http://code-mode/mcp")
+    monkeypatch.setenv("MCP_DEV_TOKEN", "test-token")
+    monkeypatch.setattr(
+        a2a_web,
+        "create_coordinator",
+        lambda key, url, code_url, token: (key, url, code_url, token),
+    )
 
     async def dispatch(_request, *, agent):
         return SimpleNamespace(status_code=200, body=agent)
@@ -125,7 +131,12 @@ def test_ag_ui_dispatches_with_configured_model(monkeypatch):
     )
 
     assert response.status_code == 200
-    assert response.body == ("test-key", "http://agents")
+    assert response.body == (
+        "test-key",
+        "http://agents",
+        "http://code-mode/mcp",
+        "test-token",
+    )
 
 
 def test_coordinator_delegates_to_each_specialist(monkeypatch):
@@ -136,7 +147,9 @@ def test_coordinator_delegates_to_each_specialist(monkeypatch):
         return "specialist result"
 
     monkeypatch.setattr(a2a_web, "_ask_specialist", ask)
-    agent = a2a_web.create_coordinator("test-key", "http://agents")
+    agent = a2a_web.create_coordinator(
+        "test-key", "http://agents", "http://code-mode/mcp", "test-token"
+    )
     tools = agent._function_toolset.tools
 
     async def invoke_all():
@@ -155,6 +168,16 @@ def test_coordinator_delegates_to_each_specialist(monkeypatch):
         ("http://agents/prices", "Ticker NVDA. review the data"),
         ("http://agents/news", "Ticker NVDA. review the data"),
     ]
+
+
+def test_coordinator_connects_to_authenticated_code_mode_server():
+    agent = a2a_web.create_coordinator(
+        "test-key", "http://agents", "http://code-mode/mcp", "test-token"
+    )
+
+    toolset = agent._user_toolsets[0]
+    assert toolset.client.transport.url == "http://code-mode/mcp"
+    assert toolset.client.transport.auth is not None
 
 
 def test_create_app_registers_ag_ui_and_three_specialist_endpoints(monkeypatch):

@@ -10,6 +10,17 @@ services:
       - market-data-cache:/app/.cache/market-data
     restart: unless-stopped
 
+  code-mode-server:
+    build: .
+    command: ["uv", "run", "--frozen", "experiment-mcp-code-mode"]
+    environment:
+      MCP_DEV_TOKEN: ${MCP_DEV_TOKEN:?Set MCP_DEV_TOKEN in .env}
+    ports:
+      - "8001:8001"
+    volumes:
+      - market-data-cache:/app/.cache/market-data
+    restart: unless-stopped
+
   mcp-app-preview:
     build: .
     command:
@@ -41,6 +52,7 @@ services:
     environment:
       MCP_DEV_TOKEN: ${MCP_DEV_TOKEN:?Set MCP_DEV_TOKEN in .env}
       MCP_URL: http://mcp-server:8000/mcp
+      CODE_MODE_MCP_URL: http://code-mode-server:8001/mcp
       A2A_PUBLIC_URL: http://127.0.0.1:8100
       OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
       OPENROUTER_MODEL: ${OPENROUTER_MODEL:-nvidia/nemotron-3-ultra-550b-a55b:free}
@@ -48,17 +60,18 @@ services:
       - "8100:8100"
     depends_on:
       - mcp-server
+      - code-mode-server
     restart: unless-stopped
 
   a2a-ui:
     build:
       context: .
       target: ui-build
-    command: ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "5173"]
+    command: ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "5178"]
     environment:
       A2A_AGENT_URL: http://agent-web:8100
     ports:
-      - "5173:5173"
+      - "5178:5178"
     depends_on:
       - agent-web
     restart: unless-stopped
