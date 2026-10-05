@@ -52,7 +52,7 @@ class MarketSpecialistExecutor(AgentExecutor):
                     answer = f"Recent news for {ticker}: {_as_text(data)}"
             await updater.add_artifact([Part(text=answer, media_type="text/plain")])
             await updater.complete()
-        except Exception:
+        except Exception:  # noqa: BLE001 - convert any upstream MCP failure to an A2A task failure.
             await updater.failed(
                 Message(
                     role=Role.ROLE_AGENT,

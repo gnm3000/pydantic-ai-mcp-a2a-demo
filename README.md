@@ -129,6 +129,7 @@ The cache and local secrets are excluded from Git.
 ## Development checks
 
 ```bash
+uv run ruff check .
 uv run pytest
 npm --prefix ui run lint
 npm --prefix ui run build

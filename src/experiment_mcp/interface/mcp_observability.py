@@ -15,9 +15,7 @@ def register_console_observability(mcp: FastMCP) -> None:
     logger.propagate = False
     logger.handlers.clear()
     handler = logging.StreamHandler(sys.stdout)
-    handler.setFormatter(
-        logging.Formatter("%(asctime)s %(levelname)s %(name)s: %(message)s")
-    )
+    handler.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(name)s: %(message)s"))
     logger.addHandler(handler)
 
     mcp.add_middleware(LoggingMiddleware(logger=logger, include_payloads=False))

@@ -63,19 +63,22 @@ async def run_demo(tickers: list[str], token: str) -> None:
 
 @app.command()
 def main(
-    ticker: Annotated[list[str], typer.Option("--ticker", help="Ticker symbol; repeat up to five times.")] = ["NVDA"],
+    ticker: Annotated[
+        list[str] | None, typer.Option("--ticker", help="Ticker symbol; repeat up to five times.")
+    ] = None,
 ) -> None:
     """Start a multi-ticker task and display its protocol updates."""
     token = os.getenv("MCP_DEV_TOKEN")
     if not token:
         typer.echo("MCP_DEV_TOKEN is not set in .env or the environment.", err=True)
         raise typer.Exit(code=1)
-    if not 1 <= len(ticker) <= 5:
+    tickers = ticker or ["NVDA"]
+    if not 1 <= len(tickers) <= 5:
         typer.echo("Provide between one and five tickers.", err=True)
         raise typer.Exit(code=2)
 
     try:
-        asyncio.run(run_demo(ticker, token))
+        asyncio.run(run_demo(tickers, token))
     except Exception as error:
         typer.echo(f"Could not run the MCP demo: {error}", err=True)
         raise typer.Exit(code=1) from error

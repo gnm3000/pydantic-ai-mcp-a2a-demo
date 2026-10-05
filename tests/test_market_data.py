@@ -37,7 +37,9 @@ def test_use_case_fetches_once_for_repeated_request(tmp_path: Path):
     first = use_case.execute("aapl", period="5d")
     second = use_case.execute("AAPL", period="5d")
 
-    assert source.calls == [("AAPL", {"period": "5d", "interval": "1d", "start": None, "end": None})]
+    assert source.calls == [
+        ("AAPL", {"period": "5d", "interval": "1d", "start": None, "end": None})
+    ]
     assert first == second
 
 
@@ -81,7 +83,9 @@ def test_expired_cache_entry_is_fetched_again(tmp_path: Path, monkeypatch):
 
 
 def test_date_range_requires_both_start_and_end(tmp_path: Path):
-    use_case = GetPriceHistory(FakeMarketDataProvider(sample_history()), JsonFileHistoryCache(tmp_path))
+    use_case = GetPriceHistory(
+        FakeMarketDataProvider(sample_history()), JsonFileHistoryCache(tmp_path)
+    )
 
     with pytest.raises(ValueError, match="start and end"):
         use_case.execute("MSFT", start="2025-01-01")

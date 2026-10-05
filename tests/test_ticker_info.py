@@ -10,13 +10,15 @@ import experiment_mcp.infra.yfinance_ticker_info_provider as yfinance_info_modul
 from experiment_mcp.application.get_ticker_data import GetTickerData
 from experiment_mcp.application.get_ticker_info import GetTickerInfo
 from experiment_mcp.core.models import TickerInfo
-from experiment_mcp.infra.yfinance_ticker_info_provider import YFinanceTickerInfoProvider
-from experiment_mcp.interface.mcp_resources import register_resources
+from experiment_mcp.infra.yfinance_ticker_info_provider import (
+    YFinanceTickerInfoProvider,
+)
 from experiment_mcp.interface.mcp_prompts import (
     build_analyze_ticker_prompt_v1,
     build_analyze_ticker_prompt_v2,
     register_prompts,
 )
+from experiment_mcp.interface.mcp_resources import register_resources
 
 
 class FakeTickerInfoProvider:
@@ -39,7 +41,9 @@ class FakeTickerDataProvider:
 
 
 def test_use_case_normalizes_ticker_before_calling_provider():
-    provider = FakeTickerInfoProvider(TickerInfo("AAPL", "Apple Inc.", None, None, None, None, None, None, None, None))
+    provider = FakeTickerInfoProvider(
+        TickerInfo("AAPL", "Apple Inc.", None, None, None, None, None, None, None, None)
+    )
 
     result = GetTickerInfo(provider).execute(" aapl ")
 
@@ -48,7 +52,9 @@ def test_use_case_normalizes_ticker_before_calling_provider():
 
 
 def test_use_case_rejects_blank_ticker():
-    provider = FakeTickerInfoProvider(TickerInfo("", None, None, None, None, None, None, None, None, None))
+    provider = FakeTickerInfoProvider(
+        TickerInfo("", None, None, None, None, None, None, None, None, None)
+    )
 
     with pytest.raises(ValueError, match="cannot be empty"):
         GetTickerInfo(provider).execute("  ")
@@ -123,7 +129,18 @@ def test_yfinance_adapter_rejects_unknown_ticker(monkeypatch):
 
 def test_resource_template_reads_symbol_info_as_json():
     provider = FakeTickerInfoProvider(
-        TickerInfo("AAPL", "Apple Inc.", "NASDAQ", "USD", "EQUITY", "Technology", None, "United States", None, None)
+        TickerInfo(
+            "AAPL",
+            "Apple Inc.",
+            "NASDAQ",
+            "USD",
+            "EQUITY",
+            "Technology",
+            None,
+            "United States",
+            None,
+            None,
+        )
     )
     data_provider = FakeTickerDataProvider()
     app = FastMCP("test")
@@ -134,7 +151,9 @@ def test_resource_template_reads_symbol_info_as_json():
 
     templates = asyncio.run(list_templates())
 
-    profile_template = next(item for item in templates if item.uri_template == "market://symbols/{ticker}")
+    profile_template = next(
+        item for item in templates if item.uri_template == "market://symbols/{ticker}"
+    )
     assert profile_template.mime_type == "application/json"
     assert profile_template.tags == {"market-data", "ticker", "company-profile"}
     assert profile_template.meta == {"provider": "yfinance", "data_kind": "ticker-profile"}
@@ -161,8 +180,7 @@ def test_extra_yfinance_resources_return_structured_data():
     for kind in ("quote", "recommendations", "calendar", "news", "actions"):
         assert GetTickerData(data_provider).execute(" nvda ", kind) == {"sample": kind}
     assert data_provider.calls == [
-        ("NVDA", kind)
-        for kind in ("quote", "recommendations", "calendar", "news", "actions")
+        ("NVDA", kind) for kind in ("quote", "recommendations", "calendar", "news", "actions")
     ]
 
 
@@ -174,9 +192,7 @@ def test_analyze_ticker_prompt_includes_profile_and_skill():
     async def get_prompt():
         return await app.get_prompt("analyze_ticker")
 
-    payload = json.loads(
-        build_analyze_ticker_prompt_v2("nvda", "What is the recent price trend?")
-    )
+    payload = json.loads(build_analyze_ticker_prompt_v2("nvda", "What is the recent price trend?"))
     assert asyncio.run(get_prompt()) is not None
 
     async def list_prompts():
@@ -201,7 +217,9 @@ def test_analyze_ticker_prompt_v1_keeps_the_flat_contract():
     assert payload["skill_uri"] == "skill://market-analysis/SKILL.md"
 
 
-@pytest.mark.parametrize("builder", [build_analyze_ticker_prompt_v1, build_analyze_ticker_prompt_v2])
+@pytest.mark.parametrize(
+    "builder", [build_analyze_ticker_prompt_v1, build_analyze_ticker_prompt_v2]
+)
 def test_analyze_ticker_prompt_versions_reject_blank_tickers(builder):
     with pytest.raises(ValueError, match="cannot be empty"):
         builder("  ")

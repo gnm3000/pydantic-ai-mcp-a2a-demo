@@ -33,9 +33,7 @@ class JsonFileHistoryCache:
         payload = {
             "fetched_at": time.time(),
             "ticker": history.ticker,
-            "bars": [
-                {"timestamp": bar.timestamp, "values": bar.values} for bar in history.bars
-            ],
+            "bars": [{"timestamp": bar.timestamp, "values": bar.values} for bar in history.bars],
         }
         descriptor, temporary_path = tempfile.mkstemp(dir=self.cache_dir, suffix=".tmp")
         try:

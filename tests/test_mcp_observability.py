@@ -11,9 +11,7 @@ def test_console_observability_logs_without_payloads():
     register_console_observability(app)
 
     logging = next(item for item in app.middleware if isinstance(item, LoggingMiddleware))
-    timing = next(
-        item for item in app.middleware if isinstance(item, DetailedTimingMiddleware)
-    )
+    timing = next(item for item in app.middleware if isinstance(item, DetailedTimingMiddleware))
     assert logging.include_payloads is False
     assert logging.logger.name == "experiment_mcp.mcp"
     assert timing.logger is logging.logger

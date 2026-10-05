@@ -11,12 +11,16 @@ from mcp.types import ElicitRequest, ElicitRequestFormParams, InputRequiredResul
 
 from experiment_mcp.application.get_price_history import GetPriceHistory
 from experiment_mcp.application.get_ticker_info import GetTickerInfo
-from experiment_mcp.core.models import PriceHistory
 from experiment_mcp.core.analysis import (
     compare_windows,
+)
+from experiment_mcp.core.analysis import (
     summarize_prices as summarize_price_values,
+)
+from experiment_mcp.core.analysis import (
     weighted_window_trend as calculate_weighted_window_trend,
 )
+from experiment_mcp.core.models import PriceHistory
 
 MARKET_APP_URI = "ui://quantinsider/price-chart.html"
 PRICE_PERIODS = ("5d", "1mo", "3mo", "6mo", "1y")
@@ -28,7 +32,9 @@ def register_tools(
     get_ticker_info_use_case: GetTickerInfo | None = None,
 ) -> None:
     @mcp.tool
-    def compare_price_windows(left: list[float], right: list[float]) -> dict[str, float | int | str]:
+    def compare_price_windows(
+        left: list[float], right: list[float]
+    ) -> dict[str, float | int | str]:
         """Compare two window averages and return the direction of change."""
         return compare_windows(left, right)
 
@@ -71,12 +77,11 @@ def register_tools(
         ticker: str = "AAPL", period: str = "1mo", interval: str = "1d"
     ) -> dict[str, object]:
         """Open the interactive price chart for a ticker and time range."""
-        history = get_price_history_use_case.execute(
-            ticker, period=period, interval=interval
-        )
+        history = get_price_history_use_case.execute(ticker, period=period, interval=interval)
         return _serialize_history(history)
 
     if get_ticker_info_use_case is not None:
+
         @mcp.tool(
             task=True,
             tags={"market-data", "long-running"},
@@ -90,7 +95,7 @@ def register_tools(
             ctx: Context,
             tickers: list[str],
             period: Literal["5d", "1mo", "3mo", "6mo", "1y"] | None = None,
-            progress: Progress = Progress(),
+            progress: Progress = Progress(),  # noqa: B008 - FastMCP injects the active task progress reporter.
         ) -> dict[str, object] | InputRequiredResult:
             """Build a price and company report for one to five tickers.
 
@@ -156,9 +161,7 @@ def register_tools(
                     ),
                 )
                 result = _serialize_history(history)
-                result.update(
-                    {"name": info.name, "sector": info.sector, "industry": info.industry}
-                )
+                result.update({"name": info.name, "sector": info.sector, "industry": info.industry})
                 report.append(result)
                 await progress.increment()
             return {"status": "completed", "period": period, "results": report}

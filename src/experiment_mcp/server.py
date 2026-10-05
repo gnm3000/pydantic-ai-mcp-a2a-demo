@@ -2,7 +2,6 @@
 
 from experiment_mcp.server_factory import create_server
 
-
 mcp = create_server()
 
 

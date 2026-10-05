@@ -26,8 +26,16 @@ class FakeCache:
 class FakeTickerInfoProvider:
     def get_ticker_info(self, ticker):
         return TickerInfo(
-            ticker, f"{ticker} Inc.", None, "USD", "EQUITY", "Technology",
-            "Software", "US", None, None,
+            ticker,
+            f"{ticker} Inc.",
+            None,
+            "USD",
+            "EQUITY",
+            "Technology",
+            "Software",
+            "US",
+            None,
+            None,
         )
 
 
@@ -192,8 +200,66 @@ def test_multi_ticker_task_requests_period_when_omitted():
     assert isinstance(result, InputRequiredResult)
     request = result.input_requests["analysis_period"]
     assert request.params.requested_schema["properties"]["period"]["enum"] == [
-        "5d", "1mo", "3mo", "6mo", "1y"
+        "5d",
+        "1mo",
+        "3mo",
+        "6mo",
+        "1y",
     ]
+
+
+def test_multi_ticker_task_returns_cancelled_when_period_elicitation_is_rejected():
+    from mcp.types import ElicitResult
+
+    app = build_app()
+    tool = asyncio.run(app.get_tool("analyze_multiple_tickers"))
+
+    class FakeContext:
+        def __init__(self):
+            self.input_responses = {"analysis_period": ElicitResult(action="decline")}
+
+    assert asyncio.run(tool.fn(FakeContext(), ["NVDA"])) == {
+        "status": "cancelled",
+        "results": [],
+    }
+
+
+def test_multi_ticker_task_uses_period_from_accepted_elicitation(monkeypatch):
+    from mcp.types import ElicitResult
+
+    app = build_app()
+    tool = asyncio.run(app.get_tool("analyze_multiple_tickers"))
+
+    class FakeContext:
+        def __init__(self):
+            self.input_responses = {
+                "analysis_period": ElicitResult(action="accept", content={"period": "1mo"})
+            }
+
+    class FakeProgress:
+        async def set_total(self, _total):
+            pass
+
+        async def set_message(self, _message):
+            pass
+
+        async def increment(self):
+            pass
+
+    async def fake_sleep(_seconds):
+        pass
+
+    async def fake_to_thread(function, *args, **kwargs):
+        return function(*args, **kwargs)
+
+    monkeypatch.setattr("experiment_mcp.interface.mcp_tools.asyncio.sleep", fake_sleep)
+    monkeypatch.setattr("experiment_mcp.interface.mcp_tools.asyncio.to_thread", fake_to_thread)
+    monkeypatch.setattr("experiment_mcp.interface.mcp_tools.randint", lambda _low, _high: 5)
+
+    result = asyncio.run(tool.fn(FakeContext(), ["NVDA"], progress=FakeProgress()))
+
+    assert result["period"] == "1mo"
+    assert result["status"] == "completed"
 
 
 def test_multi_ticker_task_rejects_unsupported_period():

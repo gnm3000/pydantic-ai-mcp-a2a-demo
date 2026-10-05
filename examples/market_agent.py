@@ -8,7 +8,6 @@ from pydantic_ai.messages import ToolCallPart
 from pydantic_ai.models.openrouter import OpenRouterModel
 from pydantic_ai.providers.openrouter import OpenRouterProvider
 
-
 MCP_URL = "http://127.0.0.1:8000/mcp"
 MODEL_NAME = "nvidia/nemotron-3-ultra-550b-a55b:free"
 
@@ -76,7 +75,9 @@ async def run_agent(ticker: str, question: str, api_key: str, mcp_token: str) ->
             profile = await mcp.read_resource(f"market://symbols/{ticker}")
             skill = await mcp.read_resource("skill://market-analysis/SKILL.md")
         user_messages = [message.content for message in prompt.messages if message.role == "user"]
-        user_messages.extend([f"Ticker profile resource: {profile}", f"Analysis skill resource: {skill}"])
+        user_messages.extend(
+            [f"Ticker profile resource: {profile}", f"Analysis skill resource: {skill}"]
+        )
         result = await agent.run(user_messages)
         return result.output
 

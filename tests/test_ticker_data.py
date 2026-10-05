@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import date, datetime, timezone
 
 import numpy as np
 import pandas as pd
@@ -6,7 +6,9 @@ import pytest
 
 import experiment_mcp.infra.yfinance_ticker_data_provider as data_module
 from experiment_mcp.application.get_ticker_data import GetTickerData
-from experiment_mcp.infra.yfinance_ticker_data_provider import YFinanceTickerDataProvider
+from experiment_mcp.infra.yfinance_ticker_data_provider import (
+    YFinanceTickerDataProvider,
+)
 
 
 class FakeTicker:
@@ -24,7 +26,9 @@ class FakeTicker:
         return [{"title": f"{count} {tab} headlines"}]
 
     def get_actions(self):
-        return pd.DataFrame({"Dividends": [0.25]}, index=[datetime(2026, 1, 1)])
+        return pd.DataFrame(
+            {"Dividends": [0.25]}, index=[datetime(2026, 1, 1, tzinfo=timezone.utc)]
+        )
 
 
 @pytest.mark.parametrize("kind", ["quote", "recommendations", "calendar", "news", "actions"])
@@ -42,7 +46,7 @@ def test_provider_dispatches_to_yfinance_and_normalizes_results(monkeypatch, kin
     elif kind == "news":
         assert data == [{"title": "5 news headlines"}]
     else:
-        assert data == [{"index": "2026-01-01T00:00:00", "Dividends": 0.25}]
+        assert data == [{"index": "2026-01-01T00:00:00+00:00", "Dividends": 0.25}]
 
 
 def test_get_ticker_data_rejects_empty_ticker():
@@ -60,7 +64,7 @@ def test_json_value_normalizes_special_numeric_and_pandas_values():
         "numpy": np.int64(7),
         "missing": pd.NA,
         "not_a_date": pd.NaT,
-        "nested": (datetime(2026, 1, 2), date(2026, 1, 3)),
+        "nested": (datetime(2026, 1, 2, tzinfo=timezone.utc), date(2026, 1, 3)),
     }
 
     assert YFinanceTickerDataProvider._json_value(value) == {
@@ -68,7 +72,7 @@ def test_json_value_normalizes_special_numeric_and_pandas_values():
         "numpy": 7,
         "missing": None,
         "not_a_date": None,
-        "nested": ["2026-01-02T00:00:00", "2026-01-03"],
+        "nested": ["2026-01-02T00:00:00+00:00", "2026-01-03"],
     }
 
 

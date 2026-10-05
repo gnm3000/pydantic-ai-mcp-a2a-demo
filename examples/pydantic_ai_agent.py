@@ -8,9 +8,7 @@ from typing import Annotated
 import logfire
 import typer
 from dotenv import load_dotenv
-
 from market_agent import run_agent
-
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 app = typer.Typer(help="Pydantic AI agent consuming the local market MCP.")

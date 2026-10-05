@@ -1,6 +1,5 @@
-from mcp.types import CompletionArgument, PromptReference, ResourceTemplateReference
-
 from fastmcp import FastMCP
+from mcp.types import CompletionArgument, PromptReference, ResourceTemplateReference
 
 from experiment_mcp.interface.mcp_completions import (
     complete_ticker,
@@ -32,10 +31,13 @@ def test_completion_ignores_unknown_components_and_arguments():
     unknown_prompt = PromptReference(name="other_prompt")
 
     assert ticker_completions(unknown_prompt, ticker_argument) is None
-    assert ticker_completions(
-        ResourceTemplateReference(uri="other://{ticker}"),
-        CompletionArgument(name="ticker", value="A"),
-    ) is None
+    assert (
+        ticker_completions(
+            ResourceTemplateReference(uri="other://{ticker}"),
+            CompletionArgument(name="ticker", value="A"),
+        )
+        is None
+    )
 
 
 def test_completion_handler_is_registered_with_fastmcp():

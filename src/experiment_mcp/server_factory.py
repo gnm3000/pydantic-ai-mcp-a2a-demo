@@ -5,16 +5,20 @@ from pathlib import Path
 
 from fastmcp import FastMCP
 from fastmcp.server.auth import AuthProvider
-from fastmcp_tasks import TasksExtension
 from fastmcp.server.providers.skills import SkillsDirectoryProvider
+from fastmcp_tasks import TasksExtension
 
 from experiment_mcp.application.get_price_history import GetPriceHistory
 from experiment_mcp.application.get_ticker_data import GetTickerData
 from experiment_mcp.application.get_ticker_info import GetTickerInfo
 from experiment_mcp.infra.json_history_cache import JsonFileHistoryCache
 from experiment_mcp.infra.yfinance_provider import YFinanceProvider
-from experiment_mcp.infra.yfinance_ticker_data_provider import YFinanceTickerDataProvider
-from experiment_mcp.infra.yfinance_ticker_info_provider import YFinanceTickerInfoProvider
+from experiment_mcp.infra.yfinance_ticker_data_provider import (
+    YFinanceTickerDataProvider,
+)
+from experiment_mcp.infra.yfinance_ticker_info_provider import (
+    YFinanceTickerInfoProvider,
+)
 from experiment_mcp.interface.mcp_apps import register_market_app
 from experiment_mcp.interface.mcp_auth import create_local_auth
 from experiment_mcp.interface.mcp_completions import register_completions

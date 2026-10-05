@@ -1,7 +1,8 @@
 """yfinance adapter for descriptive ticker information."""
 
-from experiment_mcp.core.models import TickerInfo
 import yfinance as yf
+
+from experiment_mcp.core.models import TickerInfo
 
 
 class YFinanceTickerInfoProvider:

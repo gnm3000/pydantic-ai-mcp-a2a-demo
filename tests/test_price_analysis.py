@@ -24,7 +24,7 @@ def test_compare_windows_reports_flat_average():
 
 
 def test_weighted_window_trend_rejects_too_few_prices():
-    with pytest.raises(ValueError, match="al menos 4"):
+    with pytest.raises(ValueError, match="At least 4"):
         weighted_window_trend([1, 2, 3])
 
 
@@ -50,5 +50,5 @@ def test_summarize_prices_returns_basic_statistics():
 
 
 def test_summarize_prices_rejects_empty_input():
-    with pytest.raises(ValueError, match="al menos 1"):
+    with pytest.raises(ValueError, match="At least 1"):
         summarize_prices([])

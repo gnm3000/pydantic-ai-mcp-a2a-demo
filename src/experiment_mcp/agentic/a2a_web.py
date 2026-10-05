@@ -1,6 +1,7 @@
 """AG-UI coordinator and A2A specialist endpoints for the browser demo."""
 
 import os
+
 from a2a.client import ClientConfig, ClientFactory
 from a2a.server.request_handlers import DefaultRequestHandler
 from a2a.server.routes import create_agent_card_routes, create_jsonrpc_routes
@@ -38,7 +39,9 @@ def _agent_card(name: str, description: str, url: str, skill_id: str) -> AgentCa
     return AgentCard(
         name=name,
         description=description,
-        supported_interfaces=[AgentInterface(url=url, protocol_binding="JSONRPC", protocol_version="1.0")],
+        supported_interfaces=[
+            AgentInterface(url=url, protocol_binding="JSONRPC", protocol_version="1.0")
+        ],
         version="1.0.0",
         capabilities=AgentCapabilities(streaming=True),
         default_input_modes=["text/plain"],
@@ -90,7 +93,11 @@ async def _ask_specialist(base_url: str, user_request: str) -> str:
         async for response in client.send_message(request):
             chunks.append(_text_from_response(response))
     return next(
-        (chunk for chunk in reversed(chunks) if chunk != "The agent finished without returning text."),
+        (
+            chunk
+            for chunk in reversed(chunks)
+            if chunk != "The agent finished without returning text."
+        ),
         chunks[-1] if chunks else "No response from the specialist.",
     )
 
@@ -107,7 +114,9 @@ def create_coordinator(api_key: str, a2a_base_url: str) -> Agent[None, str]:
     )
 
     @agent.tool
-    async def delegate_to_fundamentals_agent(ctx: RunContext[None], ticker: str, request: str) -> str:
+    async def delegate_to_fundamentals_agent(
+        ctx: RunContext[None], ticker: str, request: str
+    ) -> str:
         """Ask the Company Fundamentals agent for profile and business context."""
         del ctx
         return await _ask_specialist(f"{a2a_base_url}/fundamentals", f"Ticker {ticker}. {request}")
@@ -130,7 +139,9 @@ def create_coordinator(api_key: str, a2a_base_url: str) -> Agent[None, str]:
 async def ag_ui(request: Request) -> Response:
     api_key = os.getenv("OPENROUTER_API_KEY")
     if not api_key:
-        return JSONResponse({"error": "Set OPENROUTER_API_KEY in .env to use the chat."}, status_code=503)
+        return JSONResponse(
+            {"error": "Set OPENROUTER_API_KEY in .env to use the chat."}, status_code=503
+        )
     base_url = os.getenv("A2A_PUBLIC_URL", "http://127.0.0.1:8100")
     agent = create_coordinator(api_key, base_url)
     return await AGUIAdapter.dispatch_request(request, agent=agent)
@@ -142,14 +153,18 @@ def create_app() -> Starlette:
     routes = [Route("/ag-ui", ag_ui, methods=["POST"])]
     for key, (name, description) in SPECIALISTS.items():
         path = f"/{key}"
-        card = _agent_card(name, description, f"{os.getenv('A2A_PUBLIC_URL', 'http://127.0.0.1:8100')}{path}", key)
+        card = _agent_card(
+            name, description, f"{os.getenv('A2A_PUBLIC_URL', 'http://127.0.0.1:8100')}{path}", key
+        )
         handler = DefaultRequestHandler(
             agent_executor=MarketSpecialistExecutor(key, mcp_url, token),
             task_store=InMemoryTaskStore(),
             agent_card=card,
         )
         routes.extend(create_jsonrpc_routes(handler, rpc_url=path))
-        routes.extend(create_agent_card_routes(card, card_url=f"{path}/.well-known/agent-card.json"))
+        routes.extend(
+            create_agent_card_routes(card, card_url=f"{path}/.well-known/agent-card.json")
+        )
     return Starlette(routes=routes)
 
 
