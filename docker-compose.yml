@@ -1,0 +1,67 @@
+services:
+  mcp-server:
+    build: .
+    command: ["uv", "run", "--frozen", "experiment-mcp"]
+    environment:
+      MCP_DEV_TOKEN: ${MCP_DEV_TOKEN:?Set MCP_DEV_TOKEN in .env}
+    ports:
+      - "8000:8000"
+    volumes:
+      - market-data-cache:/app/.cache/market-data
+    restart: unless-stopped
+
+  mcp-app-preview:
+    build: .
+    command:
+      - uv
+      - run
+      - --frozen
+      - fastmcp
+      - dev
+      - apps
+      - examples/fastmcp_app_preview.py
+      - --host
+      - 0.0.0.0
+      - --mcp-port
+      - "8000"
+      - --dev-port
+      - "8080"
+      - --no-reload
+    environment:
+      BROWSER: /bin/true
+    ports:
+      - "8081:8080"
+    volumes:
+      - market-data-cache:/app/.cache/market-data
+    restart: unless-stopped
+
+  agent-web:
+    build: .
+    command: ["uv", "run", "--frozen", "uvicorn", "experiment_mcp.agentic.a2a_web:app", "--host", "0.0.0.0", "--port", "8100"]
+    environment:
+      MCP_DEV_TOKEN: ${MCP_DEV_TOKEN:?Set MCP_DEV_TOKEN in .env}
+      MCP_URL: http://mcp-server:8000/mcp
+      A2A_PUBLIC_URL: http://127.0.0.1:8100
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
+      OPENROUTER_MODEL: ${OPENROUTER_MODEL:-nvidia/nemotron-3-ultra-550b-a55b:free}
+    ports:
+      - "8100:8100"
+    depends_on:
+      - mcp-server
+    restart: unless-stopped
+
+  a2a-ui:
+    build:
+      context: .
+      target: ui-build
+    command: ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "5173"]
+    environment:
+      A2A_AGENT_URL: http://agent-web:8100
+    ports:
+      - "5173:5173"
+    depends_on:
+      - agent-web
+    restart: unless-stopped
+
+volumes:
+  market-data-cache:

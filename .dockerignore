@@ -1,0 +1,13 @@
+.git
+.venv
+.cache
+.env
+.env.*
+!.env.example
+node_modules
+ui/node_modules
+ui/dist
+__pycache__
+.pytest_cache
+.coverage*
+htmlcov

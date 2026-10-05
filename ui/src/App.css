@@ -1,0 +1,68 @@
+.dashboard {
+  --surface: #111820;
+  --surface-raised: #17212b;
+  --line: #293742;
+  --muted: #8a9aa7;
+  --text: #edf4f7;
+  --accent: #57d6ad;
+  --chart-line: #62dfb5;
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 32px clamp(18px, 5vw, 56px) 26px;
+  color: var(--text);
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+}
+
+.topbar { display: flex; align-items: center; gap: 14px; margin-bottom: 30px; }
+.brand-mark { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 13px; color: #0b1715; background: var(--accent); font-weight: 850; }
+.eyebrow { margin: 0 0 5px; color: var(--muted); font-size: 10px; font-weight: 750; letter-spacing: .14em; }
+h1, h2, p { margin-top: 0; }
+h1 { margin-bottom: 0; font-size: 21px; letter-spacing: -.035em; }
+.connection { display: inline-flex; align-items: center; gap: 8px; margin-left: auto; color: var(--muted); font-size: 12px; }
+.connection-dot { width: 7px; height: 7px; border-radius: 50%; background: #e5a85a; }
+.is-connected .connection-dot { background: var(--accent); box-shadow: 0 0 10px #57d6ad70; }
+
+.controls { display: flex; align-items: end; gap: 12px; margin-bottom: 18px; }
+.controls label { display: grid; gap: 7px; color: var(--muted); font-size: 11px; font-weight: 700; }
+.controls input, .controls select { box-sizing: border-box; min-width: 150px; height: 42px; padding: 0 12px; border: 1px solid var(--line); border-radius: 9px; outline: none; color: var(--text); background: var(--surface-raised); font: inherit; }
+.controls input:focus, .controls select:focus { border-color: var(--accent); }
+.controls button { display: inline-flex; align-items: center; justify-content: center; gap: 12px; height: 42px; padding: 0 17px; border: 0; border-radius: 9px; color: #092019; background: var(--accent); font: inherit; font-size: 12px; font-weight: 800; cursor: pointer; }
+.controls button:disabled { opacity: .48; cursor: not-allowed; }
+.controls button span { font-size: 15px; }
+
+.market-card, .empty-state { padding: 24px; border: 1px solid var(--line); border-radius: 16px; background: linear-gradient(140deg, var(--surface-raised), var(--surface)); }
+.card-heading { display: flex; align-items: start; justify-content: space-between; }
+.card-heading h2 { margin: 0; font-size: 28px; letter-spacing: -.04em; }
+.quote { display: grid; justify-items: end; gap: 4px; }
+.quote strong { font-size: 26px; letter-spacing: -.04em; }
+.quote span { font-size: 11px; }
+.positive { color: var(--accent); }
+.negative { color: #f28e8e; }
+.chart-wrap { position: relative; padding: 24px 0 0 42px; }
+.chart-scale { position: absolute; inset: 28px auto 28px 0; display: flex; flex-direction: column; justify-content: space-between; color: var(--muted); font-size: 10px; font-variant-numeric: tabular-nums; }
+.price-chart { display: block; width: 100%; overflow: visible; }
+.chart-grid { stroke: var(--line); stroke-dasharray: 4 7; stroke-width: 1; }
+.chart-line { fill: none; stroke: var(--chart-line); stroke-linecap: round; stroke-linejoin: round; stroke-width: 3; vector-effect: non-scaling-stroke; }
+.chart-dates, .card-footer { display: flex; justify-content: space-between; color: var(--muted); font-size: 10px; }
+.card-footer { margin-top: 20px; padding-top: 14px; border-top: 1px solid var(--line); }
+.chart-empty { display: grid; min-height: 230px; place-items: center; color: var(--muted); font-size: 12px; }
+.empty-state { display: grid; justify-items: center; min-height: 250px; align-content: center; text-align: center; }
+.empty-icon { margin-bottom: 12px; color: var(--accent); font-size: 44px; line-height: 1; }
+.empty-state h2 { margin-bottom: 8px; font-size: 17px; }
+.empty-state p, .disclaimer { color: var(--muted); font-size: 11px; }
+.error-message { padding: 11px 13px; border: 1px solid #813c42; border-radius: 8px; color: #ffb6b6; background: #401d23; font-size: 12px; }
+.disclaimer { margin: 18px 0 0; text-align: right; }
+
+@media (max-width: 620px) {
+  .dashboard { padding-top: 22px; }
+  .topbar { margin-bottom: 22px; }
+  .controls { align-items: stretch; flex-wrap: wrap; }
+  .controls label { flex: 1 1 130px; }
+  .controls input, .controls select { width: 100%; min-width: 0; }
+  .controls button { flex: 1 1 100%; }
+  .market-card, .empty-state { padding: 18px 14px; }
+  .card-heading h2 { font-size: 23px; }
+  .quote strong { font-size: 21px; }
+  .chart-wrap { padding-left: 36px; }
+  .card-footer { gap: 12px; flex-wrap: wrap; }
+}

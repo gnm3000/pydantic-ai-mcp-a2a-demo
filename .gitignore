@@ -1,0 +1,36 @@
+# Python bytecode and build artifacts
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info/
+node_modules/
+ui/dist/
+
+# Local environments and secrets
+.venv/
+venv/
+ENV/
+.env
+.env.*
+!.env.example
+
+# Test and tooling caches / reports
+.cache/
+.playwright-mcp/
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+.mypy_cache/
+.ruff_cache/
+.pytype/
+
+# Notebook and operating-system artifacts
+.ipynb_checkpoints/
+.DS_Store
+Thumbs.db
+*.log
